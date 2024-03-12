@@ -16,19 +16,17 @@ reduceForEach(arr, forEachFn);
 
 console.log("\nMAP");
 
-// stephg potentially more space saving (not creating a new array for every round of reduce), but more verbose
-// const reduceMap = <T_in, T_out>(arr: T_in[], doFn: (each: T_in) => T_out): T_out[] => {
-//     const mappedArr: T_out[] = [];
-//     arr.reduce((_, curr) => {
-//         mappedArr.push(doFn(curr))
-//         return undefined;
-//     }, undefined);
-//     return mappedArr;
-// }
-
 const reduceMap = <T_in, T_out>(arr: T_in[], doFn: (each: T_in) => T_out): T_out[] => {
-    return arr.reduce((prev, curr) => [...prev, doFn(curr)], [] as T_out[]);
+    return arr.reduce((prev, curr) => {
+        prev.push(doFn(curr))
+        return prev;
+    }, [] as T_out[]);
 }
+
+// stephg - uses substantially more time and space when using the spread operator instead of `.push()`, but it looks nice
+// const reduceMap = <T_in, T_out>(arr: T_in[], doFn: (each: T_in) => T_out): T_out[] => {
+//     return arr.reduce((prev, curr) => [...prev, doFn(curr)], [] as T_out[]);
+// }
 
 const mapFn = (x: number) => x * 2;
 console.log(reduceMap(arr, mapFn));
@@ -40,7 +38,8 @@ console.log(reduceMap(arr, mapFnToString));
 console.log("\nFILTER");
 const reduceFilter = <T>(arr: T[], predicate: (val: T) => boolean) => {
     return arr.reduce((prev, curr) => {
-        return predicate(curr) ? [...prev, curr] : prev;
+        if (predicate(curr)) prev.push(curr);
+        return prev;
     }, [] as T[]);
 }
 
